@@ -1,4 +1,5 @@
 intalar
-- npm install
+npm install
+/////////////
 iniciar el servidor
-- node app.js
+node app.js
