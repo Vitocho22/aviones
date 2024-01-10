@@ -1,0 +1,127 @@
+CREATE DATABASE aviones
+USE aviones
+
+CREATE TABLE administrador (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    contrasena VARCHAR(255) NOT NULL,
+    role VARCHAR(255) NOT NULL
+);
+
+
+SELECT * FROM administrador
+
+
+INSERT INTO administrador (username, email, contrasena,role)
+VALUES ('victor','vitos@gmail.com', '12345678', 'admin');
+
+
+CREATE TABLE PERSONA (
+  codigo INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE BASE (
+  nombre VARCHAR(255) PRIMARY KEY,
+  ubicacion VARCHAR(255) NOT NULL,
+  capacidad INT,
+  facilidades TEXT
+);
+
+CREATE TABLE PILOTO (
+  codigo INT PRIMARY KEY,
+  horas_vuelo INT NOT NULL,
+  licencia VARCHAR(255),
+  fecha_certificacion DATE,
+  nacionalidad VARCHAR(50),
+  email VARCHAR(255),
+  telefono VARCHAR(50),
+  base_codigo VARCHAR(255),
+  FOREIGN KEY (codigo) REFERENCES PERSONA(codigo),
+  FOREIGN KEY (base_codigo) REFERENCES BASE(nombre)
+);
+
+CREATE TABLE MIEMBRO (
+  codigo INT PRIMARY KEY,
+  funcion VARCHAR(255),
+  fecha_ingreso DATE,
+  idiomas VARCHAR(255),
+  email VARCHAR(255),
+  telefono VARCHAR(50),
+  base_codigo VARCHAR(255),
+  FOREIGN KEY (codigo) REFERENCES PERSONA(codigo),
+  FOREIGN KEY (base_codigo) REFERENCES BASE(nombre)
+);
+
+CREATE TABLE AVION (
+  codigo VARCHAR(255) PRIMARY KEY,
+  tipo VARCHAR(255) NOT NULL,
+  modelo VARCHAR(255),
+  capacidad INT,
+  año_fabricacion YEAR,
+  ultima_revision DATE,
+  base_codigo VARCHAR(255),
+  FOREIGN KEY (base_codigo) REFERENCES BASE(nombre)
+);
+
+CREATE TABLE VUELO (
+  num_vuelo VARCHAR(255) PRIMARY KEY,
+  origen VARCHAR(255) NOT NULL,
+  destino VARCHAR(255) NOT NULL,
+  hora TIME NOT NULL,
+  fecha DATE NOT NULL,
+  avion_codigo VARCHAR(255) NOT NULL,
+  piloto_codigo INT NOT NULL,
+  FOREIGN KEY (avion_codigo) REFERENCES AVION(codigo),
+  FOREIGN KEY (piloto_codigo) REFERENCES PILOTO(codigo)
+);
+
+-- Table for the many-to-many relationship between VUELO and MIEMBRO
+CREATE TABLE VUELO_MIEMBRO (
+  vuelo_num_vuelo VARCHAR(255) NOT NULL,
+  miembro_codigo INT NOT NULL,
+  PRIMARY KEY (vuelo_num_vuelo, miembro_codigo),
+  FOREIGN KEY (vuelo_num_vuelo) REFERENCES VUELO(num_vuelo),
+  FOREIGN KEY (miembro_codigo) REFERENCES MIEMBRO(codigo)
+);
+
+-- Inserting data into PERSONA
+INSERT INTO PERSONA (nombre) VALUES ('Juan Perez');
+INSERT INTO PERSONA (nombre) VALUES ('Laura García');
+INSERT INTO PERSONA (nombre) VALUES ('Carlos Sánchez');
+INSERT INTO PERSONA (nombre) VALUES ('Ana Torres');
+
+-- Inserting data into BASE
+INSERT INTO BASE (nombre, ubicacion, capacidad, facilidades) 
+VALUES ('Base Central', 'Ciudad Metrópolis', 50, 'Hangar, Control de Tráfico, Sala de Pilotos');
+
+-- Inserting data into PILOTO
+INSERT INTO PILOTO (codigo, horas_vuelo, licencia, fecha_certificacion, nacionalidad, email, telefono, base_codigo) 
+VALUES 
+((SELECT codigo FROM PERSONA WHERE nombre = 'Juan Perez'), 1200, 'ATPL12345', '2015-08-01', 'Peruana', 'juan.perez@email.com', '987654321', 'Base Central'),
+((SELECT codigo FROM PERSONA WHERE nombre = 'Laura García'), 800, 'CPL54321', '2017-05-15', 'Chilena', 'laura.garcia@email.com', '987654322', 'Base Central');
+
+-- Inserting data into MIEMBRO
+INSERT INTO MIEMBRO (codigo, funcion, fecha_ingreso, idiomas, email, telefono, base_codigo) 
+VALUES 
+((SELECT codigo FROM PERSONA WHERE nombre = 'Carlos Sánchez'), 'Copiloto', '2018-03-01', 'Español, Inglés', 'carlos.sanchez@email.com', '987654323', 'Base Central'),
+((SELECT codigo FROM PERSONA WHERE nombre = 'Ana Torres'), 'Auxiliar de Vuelo', '2019-06-20', 'Español, Francés, Alemán', 'ana.torres@email.com', '987654324', 'Base Central');
+
+-- Inserting data into AVION
+INSERT INTO AVION (codigo, tipo, modelo, capacidad, año_fabricacion, ultima_revision, base_codigo) 
+VALUES 
+('BOEING-747', 'Comercial', '747', 416, 1998, '2023-01-15', 'Base Central'),
+('AIRBUS-A320', 'Comercial', 'A320', 180, 2005, '2023-02-20', 'Base Central');
+
+-- Inserting data into VUELO
+INSERT INTO VUELO (num_vuelo, origen, destino, hora, fecha, avion_codigo, piloto_codigo) 
+VALUES 
+('IB-8830', 'Lima', 'Piura', '13:50', '2024-01-10', 'BOEING-747', (SELECT codigo FROM PILOTO WHERE licencia = 'ATPL12345'));
+
+-- Inserting data into VUELO_MIEMBRO
+INSERT INTO VUELO_MIEMBRO (vuelo_num_vuelo, miembro_codigo) 
+VALUES 
+('IB-8830', (SELECT codigo FROM MIEMBRO WHERE email = 'carlos.sanchez@email.com')),
+('IB-8830', (SELECT codigo FROM MIEMBRO WHERE email = 'ana.torres@email.com'));
+

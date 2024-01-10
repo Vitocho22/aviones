@@ -1,0 +1,9 @@
+POST http://localhost:3010/administradores/
+Content-Type: application/json
+
+{
+    "username": "victor",
+    "email": "vitocho@gmail.com",
+    "contrasena": "hola",
+    "role": "admin"
+}
