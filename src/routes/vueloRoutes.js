@@ -1,14 +1,11 @@
-// routes/AdministradorRoutes.js
 const express = require('express');
-const administradorControllers = require('../controllers/vuelosControllers');
-
 const router = express.Router();
+const vueloController = require('../controllers/vuelosControllers');
 
-// Rutas para administradores
-router.get('/', administradorControllers.getAllAdministradores);
-router.get('/:id', administradorControllers.getAdministradorById);
-router.post('/', administradorControllers.createAdministrador);
-router.put('/:id', administradorControllers.updateAdministrador);
-router.delete('/:id', administradorControllers.deleteAdministradorById);
+router.get('/', vueloController.getAllVuelos);
+router.get('/:num_vuelo', vueloController.getVueloByNumVuelo);
+router.post('/', vueloController.createVuelo);
+router.put('/:num_vuelo', vueloController.updateVuelo);
+router.delete('/:num_vuelo', vueloController.deleteVuelo);
 
 module.exports = router;
